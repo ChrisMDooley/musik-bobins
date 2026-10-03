@@ -141,8 +141,8 @@
     Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; }).forEach(function (e) {
       if (counts[e] < 3 || e === 'other') return;
       var E = M.ERRORS[e] || M.ERRORS.other, sentence = E.say, c = ctx[e];
-      var world = (c.verteilen || 0) + (c.sach || 0) + (c.einheiten || 0);
-      if (e === 'swap' && world >= counts[e] / 2) sentence += ' – vor allem bei Sachaufgaben';
+      var mel = (c.mel_lesen || 0) + (c.mel_spielen || 0);
+      if ((e === 'vorz_vergessen' || e === 'takt') && mel >= counts[e] / 2) sentence += ' – vor allem beim Lesen von Melodien';
       var often = counts[e] >= 6 ? 'häufig' : 'gelegentlich';
       out.push({ err: e, n: counts[e], text: sentence.replace('gelegentlich', often).replace('manchmal', often) + '.' });
     });

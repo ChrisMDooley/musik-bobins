@@ -72,6 +72,7 @@
       if (it.bar) { el('line', { x1: it.x, x2: it.x, y1: y(8), y2: y(0), class: 'bl' }, svg); return; }
       var e = it.e, g = el('g', { class: 'ev' + (e.cls ? ' ' + e.cls : ''), 'data-i': it.i }, notesG), hx = it.x, hy = y(e.p);
       if (e.color) g.style.setProperty('--c', e.color);
+      if (spec.hit) el('rect', { x: hx - 0.9 * S, y: y(maxP), width: HEAD + 1.8 * S, height: y(minP) - y(maxP), class: 'hit' }, g);   // a big tap target
       // ledger lines
       T.ledgers(e.p).forEach(function (q) { el('line', { x1: hx - 0.45 * S, x2: hx + (e.dur >= 4 ? WHOLE : HEAD) + 0.45 * S, y1: y(q), y2: y(q), class: 'sl ledger' }, g); });
       if (e.acc) glyph({ '#': 'accidentalSharp', b: 'accidentalFlat', n: 'accidentalNatural' }[e.acc], hx - 1.25 * S, hy, g, 'acc');

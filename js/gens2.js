@@ -179,6 +179,9 @@
     }
     return '–';
   }
+  // how a beat sounds, in words for the feedback
+  var SAY = { 'du': '„du“ (ein neuer Ton)', 'du-de': '„du-de“ (zwei schnelle Töne)', 'a': '„-a“ (der lange Ton klingt weiter)', '–': 'nichts' };
+  function beatSay(pattern, b) { return SAY[beatSyl(pattern, b)]; }
   function rhCodes(level) { return level === 1 ? ['V', 'A'] : ['V', 'A', 'H']; }
   var BPM = { 1: 72, 2: 80, 3: 92 };
   var RH_HINTS = ['Sprich die Rhythmussilben leise mit: du, du-de, du-a.', 'Eine Viertelnote = *du* (1 Schlag). Zwei Achtel = *du-de* (1 Schlag). Eine Halbe = *du-a* (2 Schläge).', 'Klopf beim Anhören den Grundschlag mit dem Fuß mit.', 'Ein Takt hat 4 Grundschläge. Zähle mit: 1 – 2 – 3 – 4.'];
@@ -231,7 +234,7 @@
           if (!inp || !inp.id) return { incomplete: true, msg: 'Wähle eine Antwort.' };
           if (inp.id === 'r') return { ok: true };
           var f = all.filter(function (x) { return x.id === inp.id; })[0].pat, b = RH.beatDiff(p.pat, f)[0];
-          return { ok: false, err: 'rhythmus', msg: 'Schau auf Schlag ' + (b % p.per + 1) + (p.pat.length > 4 ? ' im ' + (Math.floor(b / p.per) + 1) + '. Takt' : '') + ': dort steht *' + beatSyl(p.pat, b) + '*, nicht ' + beatSyl(f, b) + '.' };
+          return { ok: false, err: 'rhythmus', msg: 'Schau auf Schlag ' + (b % p.per + 1) + (p.pat.length > 4 ? ' im ' + (Math.floor(b / p.per) + 1) + '. Takt' : '') + ': dort steht ' + beatSay(p.pat, b) + ', nicht ' + beatSay(f, b) + '.' };
         },
         hints: RH_HINTS, solution: ['Richtig ist: *' + fmt(p.pat) + '*' + (p.v === 'morse' ? ' (' + syl + ')' : '')], soundRhythm: { pattern: p.pat, bpm: p.bpm } };
     }
@@ -252,7 +255,7 @@
           if (!inp || !inp.id) return { incomplete: true, msg: 'Wähle einen Rhythmus.' };
           if (inp.id === 'r') return { ok: true };
           var f = all.filter(function (x) { return x.id === inp.id; })[0].pat, b = RH.beatDiff(p.pat, f)[0];
-          return { ok: false, err: 'rhythmus', msg: 'Auf Schlag ' + (b % p.per + 1) + (p.pat.length > 4 ? ' im ' + (Math.floor(b / p.per) + 1) + '. Takt' : '') + ' war *' + beatSyl(p.pat, b) + '* zu hören – in deiner Zeile steht ' + beatSyl(f, b) + '.' };
+          return { ok: false, err: 'rhythmus', msg: 'Auf Schlag ' + (b % p.per + 1) + (p.pat.length > 4 ? ' im ' + (Math.floor(b / p.per) + 1) + '. Takt' : '') + ' war ' + beatSay(p.pat, b) + ' zu hören – in deiner Zeile steht ' + beatSay(f, b) + '.' };
         },
         hints: RH_HINTS, solution: ['Gehört: *' + RH.syllables(p.pat) + '*'], soundRhythm: { pattern: p.pat, bpm: p.bpm } };
     }
@@ -276,7 +279,7 @@
           var isWert = bad.every(function (x) { var w = beatSyl(p.pat, x), g = beatSyl(inp.pattern, x); return (w === 'a' && g === 'du') || (w === 'du' && g === 'a'); });
           var where = bad.map(function (x) { return (p.bars > 1 ? 'Takt ' + (Math.floor(x / p.per) + 1) + ', ' : '') + 'Schlag ' + (x % p.per + 1); });
           return { ok: false, err: isWert ? 'wert' : 'rhythmus', badBeats: bad, compare: { want: p.pat, got: inp.pattern, bpm: p.bpm },
-            msg: 'Fast! ' + (bad.length === 1 ? 'Ein Schlag stimmt' : bad.length + ' Schläge stimmen') + ' noch nicht: ' + where.join(' · ') + '. Dort war *' + beatSyl(p.pat, b) + '* zu hören, du hast ' + beatSyl(inp.pattern, b) + ' geschrieben.' + (isWert ? ' (Halbe Note oder zwei Viertel? Klingt der Ton weiter oder kommt ein neuer?)' : '') };
+            msg: 'Fast! ' + (bad.length === 1 ? 'Ein Schlag stimmt' : bad.length + ' Schläge stimmen') + ' noch nicht: ' + where.join(' · ') + '. Dort war ' + beatSay(p.pat, b) + ' zu hören – du hast ' + beatSay(inp.pattern, b) + ' geschrieben.' + (isWert ? ' (Halbe Note oder zwei Viertel? Klingt der Ton weiter oder kommt ein neuer?)' : '') };
         },
         hints: ['Hör dir das ganze Diktat einmal nur an. Klopf den Grundschlag mit.', 'Sprich beim zweiten Hören leise mit: du, du-de oder du-a?', 'Schreib zuerst die Schläge auf, bei denen du sicher bist.', 'Zwei schnelle Töne in einem Schlag = du-de. Ein langer Ton über zwei Schläge = du-a.'],
         solution: ['Richtig: *' + syl + '*'], soundRhythm: { pattern: p.pat, bpm: p.bpm } };

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Musik-Bobins · Robin's Bobins</title>
+<meta name="description" content="Musik verstehen: Noten lesen, Klaviertastatur, Ganz- und Halbton, Dur-Tonleiter, Versetzungszeichen, Rhythmus und Hören.">
+<meta name="theme-color" content="#FBF5EC">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="css/musik.css">
+</head>
+<body>
+<div class="shell">
+  <header class="bar">
+    <span class="bar-left">
+      <a class="link" id="apps-link" href="#">‹ Meine Apps</a>
+      <button class="link" id="back" type="button" hidden>‹ Zurück</button>
+    </span>
+    <span class="wordmark"><span class="wm-note" aria-hidden="true">♫</span><span>Musik-<b>Bobins</b></span></span>
+    <span class="bar-right">
+      <span class="coin-pill" id="coin-pill" hidden title="Robin-Münzen"><span class="bb-coin" aria-hidden="true"></span><span id="coins">0</span></span>
+      <a class="link small" id="parent-link" href="#/eltern">Eltern</a>
+    </span>
+  </header>
+  <main id="main" aria-live="polite"></main>
+</div>
+<noscript>Musik-Bobins braucht JavaScript.</noscript>
+
+<!-- Robin's Bobins (optional). Same site on GitHub Pages → family PIN, child, Robin, coins, streaks.
+     When these files are missing (running on its own), the app works without them.
+     Guest link (?gast=<Name>, for a classmate): no family page, no family PIN; Robin's picture and the
+     guest start page (robins-bobins/shared/guest.js: coins, streak, parent PIN, "‹ Start") are used.
+     The guest is remembered on that device; an explicit ?child=… (from Robin's Bobins) always wins. -->
+<script>
+(function () {
+  var q = location.search, m = /[?&]gast=([^&#]*)/.exec(q), g = '';
+  try {
+    g = m ? decodeURIComponent(m[1]).trim() : '';
+    if (g) localStorage.setItem('rb-gast', JSON.stringify(g));
+    else if (!/[?&]child=/.test(q)) g = JSON.parse(localStorage.getItem('rb-gast') || 'null') || '';
+  } catch (e) { /* storage blocked: guest only for this visit */ }
+  window.MB_GUEST = g || null;
+  if (g) { window.RB = {}; document.write('<script src="../robins-bobins/shared/robin.js"><\/script><script src="../robins-bobins/shared/guest.js"><\/script>'); }
+  else document.write('<script src="../robins-bobins/shared/rb.js"><\/script><script src="../robins-bobins/shared/robin.js"><\/script>');
+})();
+</script>
+
+<!-- logic (no DOM) -->
+<script src="js/speech.js"></script>
+<script src="js/theory.js"></script>
+<script src="js/rhythm.js"></script>
+<script src="js/text.js"></script>
+<script src="js/model.js"></script>
+<script src="js/gens.js"></script>
+<script src="js/gens2.js"></script>
+<script src="js/progress.js"></script>
+<script src="js/session.js"></script>
+<!-- sound and pictures -->
+<script src="js/audio.js"></script>
+<script src="js/glyphs.js"></script>
+<script src="js/platform.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/staff.js"></script>
+<script src="js/piano.js"></script>
+<script src="js/vis.js"></script>
+<!-- screens -->
+<script src="js/widgets.js"></script>
+<script src="js/practice.js"></script>
+<script src="js/lessons.js"></script>
+<script src="js/screens.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

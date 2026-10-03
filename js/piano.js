@@ -20,6 +20,7 @@
     var whites = []; for (var m = from; m <= to; m++) if (!T.isBlack(m)) whites.push(m);
     var top = opts.steps ? 34 : 4, W = whites.length * WW + 2, H = top + WH + 4;
     var svg = el('svg', { viewBox: '0 0 ' + W + ' ' + H, class: 'piano-svg', role: 'group', 'aria-label': 'Klaviertastatur' });
+    svg.style.maxWidth = Math.round(W * 1.15) + 'px';          // keys about as big as on a real keyboard
     var stepsG = el('g', { class: 'steps' }, svg), keys = {}, xs = {};
     whites.forEach(function (m, i) {
       var g = el('g', { class: 'key white', 'data-m': m, tabindex: '0', role: 'button', 'aria-label': whiteName(m, true) }, svg);
