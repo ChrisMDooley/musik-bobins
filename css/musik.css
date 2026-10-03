@@ -1,0 +1,11 @@
+/* (placeholder, replaced below) */
+.staff-svg { width: 100%; height: auto; display: block; }
+.staff-svg .sl { stroke: #2A2530; stroke-width: 1.1; }
+.staff-svg .bl { stroke: #2A2530; stroke-width: 1.2; } .staff-svg .bl.end { stroke-width: 2.4; }
+.staff-svg path { fill: #2A2530; } .staff-svg .stem { stroke: #2A2530; stroke-width: 1.3; } .staff-svg .beam { fill: #2A2530; }
+.staff-svg .nlabel { font: 700 11px sans-serif; fill: #A9431C; }
+.piano-svg { width: 100%; height: auto; display: block; }
+.key.white rect { fill: #fff; stroke: #3A3540; stroke-width: 1.5; } .key.black rect { fill: #24202A; }
+.klabel { font: 700 13px sans-serif; fill: #6A6070; } .klabel.bl { fill: #fff; font-size: 10px; }
+.stp { fill: none; stroke: #E0673B; stroke-width: 3; }
+.kdot { fill: #E0673B; }
