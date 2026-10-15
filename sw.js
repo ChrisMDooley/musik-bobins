@@ -1,6 +1,6 @@
 /* sw.js — Musik-Bobins offline cache. Network first (updates arrive), cache as fallback.
    Bump VERSION on every release. */
-const VERSION = 'musik-v1.0.0';
+const VERSION = 'musik-v1.0.1';
 const FILES = ['./', 'index.html', 'manifest.webmanifest', 'css/musik.css', 'icons/icon.svg',
   'js/speech.js', 'js/theory.js', 'js/rhythm.js', 'js/text.js', 'js/model.js', 'js/gens.js', 'js/gens2.js', 'js/progress.js', 'js/session.js',
   'js/audio.js', 'js/glyphs.js', 'js/platform.js', 'js/ui.js', 'js/staff.js', 'js/piano.js', 'js/vis.js',

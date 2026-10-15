@@ -50,6 +50,14 @@
     return { raw: raw, n: T.parseName(raw.replace(/'+$/, '')), marks: (raw.match(/'+$/) || [''])[0].length };
   }
   // feedback for a wrong note name, given the right note
+  // fes, ces, eis, his land on a WHITE key: say so after a right answer, so nobody thinks the key is wrong
+  function whiteKeyNote(n) {
+    var m = T.midi(n); if (!n.a || T.isBlack(m)) return null;
+    var k = nm(T.keyNames(m)[0]), w = nm(n);
+    return 'Richtig: *' + w + '*! Auf der Tastatur ist das dieselbe Taste wie *' + k + '* – zwischen ' + (/^[ef]/.test(w) || /^[ef]/.test(k) ? 'e und f' : 'h und c') + ' liegt keine schwarze Taste. Gleicher Klang, anderer Name.';
+  }
+  function sameKey(n) { var m = T.midi(n); return n.a && !T.isBlack(m) ? ['Auf der Tastatur: dieselbe Taste wie *' + nm(T.keyNames(m)[0]) + '* (gleicher Klang, anderer Name).'] : []; }
+  function okNote(n) { var x = whiteKeyNote(n); return x ? { ok: true, note: x } : { ok: true }; }
   function nameFeedback(want, got, raw) {
     var w = nm(want);
     if (raw === 'hes') return { ok: false, err: 'endung', msg: 'Fast! Das h mit b heißt nicht „hes“, sondern einfach *b*.' };
@@ -336,24 +344,24 @@
         return { prompt: 'Spiele das *' + w + '*.', sub: '(' + nm(base) + ' mit ' + sign + ')', answer: { type: 'piano', from: 59, to: 72, labels: 'white', value: T.midi(n) },
           check: function (inp) {
             if (!inp || inp.m == null) return { incomplete: true, msg: 'Tippe auf eine Taste.' };
-            if (inp.m % 12 === T.midi(n) % 12) return { ok: true };
+            if (inp.m % 12 === T.midi(n) % 12) return okNote(n);
             if (inp.m === T.midi(base)) return { ok: false, err: 'vorz_vergessen', msg: 'Das ist das ' + nm(base) + ' ohne Versetzungszeichen. Das ' + sign + ' ' + way + ' um einen Halbton: eine Taste nach ' + (dir > 0 ? 'rechts' : 'links') + '.' };
             if (inp.m === T.midi(base) - dir) return { ok: false, err: 'richtung', msg: 'Falsche Richtung: ' + (dir > 0 ? 'Kreuz = höher = nach rechts.' : 'b = tiefer = nach links.') };
             return { ok: false, err: 'taste', msg: 'Suche zuerst das ' + nm(base) + ', dann eine Taste nach ' + (dir > 0 ? 'rechts' : 'links') + '.' };
           },
           hints: ['Finde zuerst das ' + nm(base) + '.', 'Ein ' + sign + ' ' + way + ' um einen Halbton.', 'Halbton = die direkt benachbarte Taste (schwarz oder weiß).', 'Eine Taste nach ' + (dir > 0 ? 'rechts' : 'links') + '.'],
-          solution: [w + ' = ' + nm(base) + ' ' + way + ' um einen Halbton.'], reveal: { keys: [T.midi(n)] }, sound: [T.midi(n)] };
+          solution: [w + ' = ' + nm(base) + ' ' + way + ' um einen Halbton.'].concat(sameKey(n)), reveal: { keys: [T.midi(n)] }, sound: [T.midi(n)] };
       }
       var choices = rot([w, nm(base), nm(N(p.s, -dir, 4)), T.keyNames(T.midi(n)).map(nm).filter(function (x) { return x !== w; })[0] || nm(N((p.s + dir + 7) % 7, 0, 4))].filter(function (x, i, a) { return x && a.indexOf(x) === i; }).map(function (x) { return opt(x, x); }), p.o);
       return { prompt: 'Wie heißt der Ton?', sub: '*' + nm(base) + '* mit ' + sign, visual: { type: 'staff', events: single(n), zoom: 2.6 },
         answer: p.typed ? { type: 'name', value: w } : { type: 'choice', options: choices, row: true, correct: w },
         check: function (inp) {
           var r = readName(inp); if (!r || !r.raw) return { incomplete: true, msg: 'Schreibe den Tonnamen.' };
-          if (r.n && r.n.s === n.s && r.n.a === n.a) return { ok: true };
+          if (r.n && r.n.s === n.s && r.n.a === n.a) return okNote(n);
           return nameFeedback(n, r.n, r.raw) || { ok: false, err: 'endung', msg: 'Nicht ganz. ' + nm(base) + ' mit ' + sign + ' heißt *' + w + '*.' };
         },
         hints: ['Der Stammton ist ' + nm(base) + '.', dir > 0 ? 'Bei einem Kreuz ♯ hängt man *-is* an.' : 'Bei einem b ♭ hängt man *-es* an.', dir > 0 ? 'Beispiele: c → cis, f → fis.' : 'Ausnahmen: e → es, a → as (das e fällt weg), h → b.', dir > 0 ? nm(base) + ' + is = ?' : 'd → des, g → ges … und ' + nm(base) + '?'],
-        solution: [nm(base) + ' mit ' + sign + ' heißt *' + w + '*.'], reveal: { keys: [T.midi(n)] }, sound: [T.midi(n)] };
+        solution: [nm(base) + ' mit ' + sign + ' heißt *' + w + '*.'].concat(sameKey(n)), reveal: { keys: [T.midi(n)] }, sound: [T.midi(n)] };
     };
   }
   reg({ id: 'kreuz', skill: 'kreuz', tags: ['vorz', 'short'], params: alterParams(1), build: alterBuild(1) });
@@ -375,11 +383,11 @@
         answer: p.typed ? { type: 'name', value: w } : { type: 'choice', options: [w, nm(b), nm(N(b.s, -dir, b.o)), T.keyNames(T.midi(n)).map(nm).filter(function (x) { return x !== w; })[0]].filter(function (x, i, a) { return x && a.indexOf(x) === i; }).sort().map(function (x) { return opt(x, x); }), row: true, correct: w },
         check: function (inp) {
           var r = readName(inp); if (!r || !r.raw) return { incomplete: true, msg: 'Schreibe den Tonnamen.' };
-          if (r.n && r.n.s === n.s && r.n.a === n.a) return { ok: true };
+          if (r.n && r.n.s === n.s && r.n.a === n.a) return okNote(n);
           return nameFeedback(n, r.n, r.raw) || readFeedback(n, r.n.s);
         },
         hints: ['Wie heißt der Stammton? ' + readHints(p.p)[1], 'Vor der Note steht ein ' + (dir > 0 ? 'Kreuz ♯.' : 'b ♭.'), dir > 0 ? 'Kreuz: an den Stammton *-is* anhängen.' : 'b: *-es* anhängen (es, as ohne e; h mit b heißt b).', 'Stammton ' + nm(b) + ' → ?'],
-        solution: ['Stammton *' + nm(b) + '* mit ' + (dir > 0 ? 'Kreuz' : 'b') + ' → *' + w + '*.'], reveal: { band: p.p, keys: [T.midi(n)] }, sound: [T.midi(n)] };
+        solution: ['Stammton *' + nm(b) + '* mit ' + (dir > 0 ? 'Kreuz' : 'b') + ' → *' + w + '*.'].concat(sameKey(n)), reveal: { band: p.p, keys: [T.midi(n)] }, sound: [T.midi(n)] };
     };
   }
   reg({ id: 'namen_is', skill: 'namen_is', tags: ['vorz', 'lesen', 'short'], params: namedParams(1), build: namedBuild(1, 'namen_is') });
